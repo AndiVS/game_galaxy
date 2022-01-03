@@ -51,7 +51,7 @@ func (h *AuthenticationHandler) SignIn(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 
-	service.SetTokenCookie("refreshToken", refreshToken, time.Now().Add(1000*time.Second), c)
+	service.SetTokenCookie(c, "refreshToken", refreshToken, time.Now().Add(1000*time.Second))
 
 	return c.JSON(http.StatusOK, echo.Map{
 		"token": accessToken,

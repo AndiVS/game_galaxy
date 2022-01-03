@@ -81,7 +81,7 @@ func (manager *JWTManager) Verify(Token string) (*model.Claims, error) {
 }
 
 // SetTokenCookie  set cookie for echo jwt
-func SetTokenCookie(name, token string, expiration time.Time, c echo.Context) {
+func SetTokenCookie(c echo.Context, name, token string, expiration time.Time) {
 	cookie := new(http.Cookie)
 	cookie.Name = name
 	cookie.Value = token
