@@ -9,4 +9,5 @@ type Factory struct {
 	Level           *int       `json:"level"`
 	BasePerformance *int       `json:"base_performance"`
 	BaseUpdateCost  *int       `json:"base_update_cost"`
+	BaseUpdateTime  *int       `json:"base_update_time"`
 }

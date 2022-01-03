@@ -1,15 +1,18 @@
-INSERT INTO universes VALUES( uuid_generate_v4() );
+INSERT INTO accounts(login, password) VALUES ('admin','admin');
 
-INSERT INTO galaxies(galaxy_id, universe_id) VALUES(uuid_generate_v4(), (select universe_id FROM universes)::uuid );
+INSERT INTO universes(name) VALUES( 'first_universe' );
 
-INSERT INTO systems(system_id, galaxy_id) VALUES(uuid_generate_v4(), (select galaxy_id FROM galaxies)::uuid );
+INSERT INTO users(id, account_login, universe_name, username)
+VALUES(uuid_generate_v4(), (select login FROM accounts), (select name FROM universes), 'first_user' );
 
-INSERT INTO users(user_id, universe_id, user_name) VALUES(uuid_generate_v4(), (select universe_id FROM universes)::uuid, 'first' );
+INSERT INTO galaxies(id, universe_name) VALUES(uuid_generate_v4(), (select name FROM universes));
 
-INSERT INTO planets(PLANET_ID, SYSTEM_ID, USER_ID) VALUES(uuid_generate_v4(), (select system_id FROM systems)::uuid, (select user_id FROM users)::uuid);
+INSERT INTO systems(id, galaxy_id) VALUES(uuid_generate_v4(), (select id FROM galaxies)::uuid );
 
-INSERT INTO factories(factory_id, planet_id, resource_type, building_level, base_performance, base_update_cost)
- VALUES(uuid_generate_v4(), (select planet_id FROM planets)::uuid, 'BTC', 0, 1, 1);
+INSERT INTO planets(id, system_id, user_id, name) VALUES(uuid_generate_v4(), (select id FROM systems)::uuid, (select id FROM users)::uuid, 'first_planet');
 
-INSERT INTO storages(storage_id, planet_id, resource_type, building_level, base_capacity, current_capacity, base_update_cost)
-VALUES(uuid_generate_v4(), (select planet_id FROM planets)::uuid, 'BTC', 0, 10, 1, 1);
+INSERT INTO factories(id, planet_id, resource_type, building_level, base_performance, base_update_cost, base_update_time)
+ VALUES(uuid_generate_v4(), (select id FROM planets)::uuid, 'BTC', 0, 1, 1, 1);
+
+INSERT INTO storages(id, planet_id, resource_type, building_level, base_capacity, current_capacity, base_update_cost, base_update_time)
+VALUES(uuid_generate_v4(), (select id FROM planets)::uuid, 'BTC', 0, 10, 1, 1, 1);

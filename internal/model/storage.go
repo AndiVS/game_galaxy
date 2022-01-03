@@ -10,4 +10,5 @@ type Storage struct {
 	BaseCapacity    *int       `json:"base_capacity"`
 	CurrentCapacity *int       `json:"current_capacity"`
 	BaseUpdateCost  *int       `json:"base_update_cost"`
+	BaseUpdateTime  *int       `json:"base_update_time"`
 }

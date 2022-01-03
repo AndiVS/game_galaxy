@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS universes
 (
-    id UUID PRIMARY KEY
+    name VARCHAR(30) PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS galaxies
 (
-    id          UUID PRIMARY KEY,
-    universe_id UUID REFERENCES universes (id)
+    id            UUID PRIMARY KEY,
+    universe_name VARCHAR(30) REFERENCES universes (name)
 );
 
 CREATE TABLE IF NOT EXISTS systems
@@ -15,26 +15,26 @@ CREATE TABLE IF NOT EXISTS systems
     galaxy_id UUID REFERENCES galaxies (id)
 );
 
-CREATE TABLE IF NOT EXISTS users
+CREATE TABLE IF NOT EXISTS accounts
 (
-    id          UUID PRIMARY KEY,
-    universe_id UUID,
-    user_name   VARCHAR(30)
+    login    VARCHAR(30) PRIMARY KEY,
+    password VARCHAR(200)
 );
 
 CREATE TABLE IF NOT EXISTS users
 (
-    id       UUID PRIMARY KEY REFERENCES users (id),
-    password UUID,
-    login    VARCHAR(30)
+    id            UUID PRIMARY KEY,
+    account_login VARCHAR(30) REFERENCES accounts (login),
+    universe_name VARCHAR(30) REFERENCES universes (name),
+    username      VARCHAR(30)
 );
-
 
 CREATE TABLE IF NOT EXISTS planets
 (
     id        UUID PRIMARY KEY,
     system_id UUID REFERENCES systems (id),
-    user_id   UUID REFERENCES users (id)
+    user_id   UUID REFERENCES users (id),
+    name      VARCHAR(30)
 );
 
 CREATE TABLE IF NOT EXISTS storages
@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS storages
     building_level   NUMERIC,
     base_capacity    NUMERIC,
     current_capacity NUMERIC,
-    base_update_cost NUMERIC
+    base_update_cost NUMERIC,
+    base_update_time NUMERIC
 );
 
 CREATE TABLE IF NOT EXISTS factories
@@ -55,5 +56,6 @@ CREATE TABLE IF NOT EXISTS factories
     resource_type    VARCHAR(30),
     building_level   NUMERIC,
     base_performance NUMERIC,
-    base_update_cost NUMERIC
+    base_update_cost NUMERIC,
+    base_update_time NUMERIC
 );
