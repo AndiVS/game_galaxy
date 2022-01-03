@@ -1,3 +1,4 @@
+// Package repository for working with database
 package repository
 
 import (
@@ -51,11 +52,26 @@ type System interface {
 	DeleteSystem(c context.Context, id uuid.UUID) error
 }
 
-// Users used for structuring, function for working with users
-type Users interface {
+// User used for structuring, function for working with users
+type User interface {
 	InsertUser(c context.Context, user *model.User) error
-	SelectUser(c context.Context, username string) (*model.User, error)
-	SelectAllUser(c context.Context) ([]*model.User, error)
-	UpdateUser(c context.Context, username string, isAdmin bool) error
-	DeleteUser(c context.Context, username string) error
+	SelectUser(c context.Context, id uuid.UUID) (*model.User, error)
+	DeleteUser(c context.Context, id uuid.UUID) error
+}
+
+// Planet used for structuring, function for working with planets
+type Planet interface {
+	InsertPlanet(c context.Context, planet *model.Planet) error
+	SelectPlanet(c context.Context, id uuid.UUID) (*model.Planet, error)
+	DeletePlanet(c context.Context, id uuid.UUID) error
+}
+
+// Storage used for structuring, function for working with storages
+type Storage interface {
+	UpdateStorage(c context.Context, id uuid.UUID) error
+}
+
+// Factory used for structuring, function for working with storages
+type Factory interface {
+	UpdateFactory(c context.Context, id uuid.UUID) error
 }

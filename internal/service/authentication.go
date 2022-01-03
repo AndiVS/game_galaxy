@@ -4,16 +4,17 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"net/http"
+
 	"github.com/AndiVS/game_galaxy/internal/model"
 	"github.com/AndiVS/game_galaxy/internal/repository"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 // Authentication aunt
 type Authentication interface {
 	SignUp(c context.Context, account *model.Account) error
-	SignIn(c context.Context, account *model.Account) (string, error)
+	SignIn(c context.Context, account *model.Account) (accessToken, refreshToken string, err error)
 }
 
 // AuthenticationService aunt
@@ -42,18 +43,18 @@ func (s *AuthenticationService) SignUp(c context.Context, account *model.Account
 }
 
 // SignIn generate token
-func (s *AuthenticationService) SignIn(c context.Context, account *model.Account) (accessToken string, err error) {
+func (s *AuthenticationService) SignIn(c context.Context, account *model.Account) (accessToken, refreshToken string, err error) {
 	account.Password = PasswordGenerator(account.Password, s.HashSalt)
 
 	accountFromBase, err := s.Rep.SelectAccount(c, account.Login)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	if !PasswordCheck(accountFromBase.Password, account.Password) {
-		return "", err
+		return "", "", err
 	}
 
-	return GenerateTokens(account, s.Access)
+	return GenerateTokens(account, s.Access, s.Refresh)
 }
 
 // PasswordCheck che

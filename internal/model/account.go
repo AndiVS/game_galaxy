@@ -1,3 +1,4 @@
+// Package model all models that will be used in project
 package model
 
 type Account struct {

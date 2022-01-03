@@ -2,17 +2,19 @@ package repository
 
 import (
 	"context"
+
 	"github.com/AndiVS/game_galaxy/internal/model"
-	"github.com/jackc/pgx/v4"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 // InsertUser function for inserting item from a table
 func (repos *Postgres) InsertUser(c context.Context, user *model.User) error {
 	row := repos.Pool.QueryRow(c,
-		"INSERT INTO users (username, password, is_admin) VALUES ($1, $2, $3) RETURNING username", user.Username, user.Password, false)
+		"INSERT INTO users (id, account_login, universe_name, username) VALUES ($1, $2, $3) RETURNING id",
+		user.ID, user.AccountLogin, user.UniverseName, user.Username)
 
-	err := row.Scan(&user.Username)
+	err := row.Scan(&user.ID)
 	if err != nil {
 		log.Errorf("Unable to INSERT: %v", err)
 		return err
@@ -22,12 +24,12 @@ func (repos *Postgres) InsertUser(c context.Context, user *model.User) error {
 }
 
 // SelectUser function for selecting item from a table
-func (repos *Postgres) SelectUser(c context.Context, username string) (*model.User, error) {
+func (repos *Postgres) SelectUser(c context.Context, id uuid.UUID) (*model.User, error) {
 	var user model.User
 	row := repos.Pool.QueryRow(c,
-		"SELECT username, password, is_admin  FROM users WHERE username = $1", username)
+		"SELECT id, account_login, universe_name, username FROM users WHERE id = $1", id)
 
-	err := row.Scan(&user.Username, &user.Password, &user.IsAdmin)
+	err := row.Scan(&user.ID, &user.AccountLogin, &user.UniverseName, &user.Username)
 	if err != nil {
 		log.Errorf("Unable to SELECT: %v", err)
 		return &user, err
@@ -38,40 +40,9 @@ func (repos *Postgres) SelectUser(c context.Context, username string) (*model.Us
 	return &user, err
 }
 
-// SelectAllUser function for selecting items from a table
-func (repos *Postgres) SelectAllUser(c context.Context) ([]*model.User, error) {
-	var user []*model.User
-
-	row, err := repos.Pool.Query(c,
-		"SELECT username, password, is_admin  FROM users")
-
-	for row.Next() {
-		var us model.User
-		err = row.Scan(&us.Username, &us.Password, &us.IsAdmin)
-		if err == pgx.ErrNoRows {
-			return user, err
-		}
-		user = append(user, &us)
-	}
-
-	return user, err
-}
-
-// UpdateUser function for updating item from a table
-func (repos *Postgres) UpdateUser(c context.Context, username string, isAdmin bool) error {
-	_, err := repos.Pool.Exec(c,
-		"UPDATE users SET is_admin = $2 WHERE username = $1", username, isAdmin)
-	if err != nil {
-		log.Errorf("Failed updating data in db: %s\n", err)
-		return err
-	}
-
-	return nil
-}
-
 // DeleteUser function for deleting item from a table
-func (repos *Postgres) DeleteUser(c context.Context, username string) error {
-	ct, err := repos.Pool.Exec(c, "DELETE FROM users WHERE username = $1", username)
+func (repos *Postgres) DeleteUser(c context.Context, id uuid.UUID) error {
+	ct, err := repos.Pool.Exec(c, "DELETE FROM users WHERE id = $1", id)
 
 	if err != nil {
 		return err

@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"github.com/labstack/echo/v4"
+	"net/http"
 	"time"
 
 	"github.com/AndiVS/game_galaxy/internal/model"
@@ -20,12 +22,17 @@ func NewJWTManager(secretKey []byte, tokenDuration time.Duration) *JWTManager {
 }
 
 // GenerateTokens func for token generation
-func GenerateTokens(account *model.Account, access *JWTManager) (accessToken string, err error) {
+func GenerateTokens(account *model.Account, access, refresh *JWTManager) (accessToken, refreshToken string, err error) {
 	accessToken, err = GenerateToken(account, access)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return accessToken, nil
+
+	refreshToken, err = GenerateToken(account, refresh)
+	if err != nil {
+		return "", "", err
+	}
+	return accessToken, refreshToken, nil
 }
 
 // GenerateToken generate jwt token
@@ -71,4 +78,15 @@ func (manager *JWTManager) Verify(Token string) (*model.Claims, error) {
 	}
 
 	return claims, nil
+}
+
+// SetTokenCookie  set cookie for echo jwt
+func SetTokenCookie(name, token string, expiration time.Time, c echo.Context) {
+	cookie := new(http.Cookie)
+	cookie.Name = name
+	cookie.Value = token
+	cookie.Expires = expiration
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
 }
